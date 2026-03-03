@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useScriptureSystem } from './hooks/useScriptureSystem';
 import { supabase } from './supabaseClient';
 import ReviewCard from './components/ReviewCard';
+import FAQDrawer from './FAQDrawer';
 import { AnimatePresence } from 'framer-motion';
 import { Plus, BookOpen, BarChart2, ChevronLeft, Search, Flame, Trophy, Cloud, CloudCheck, CloudOff } from 'lucide-react';
 
@@ -309,6 +310,7 @@ function AddScriptureView({ system, onClose, onAdd, fetchVerse }) {
         if(isCustom) onAdd({ id: Date.now(), reference: ref, text: manual, version: 'CUSTOM' });
         else { const v = await fetchVerse(ref, version); if(v) onAdd(v); }
       }} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Save to Daily Box</button>
+      <FAQDrawer />
     </div>
   );
 }
