@@ -1,16 +1,29 @@
-# React + Vite
+The Scripture Flow System 🌊
+This app is designed for permanent scripture retention using a Waterfall Promotion logic.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+How it Works
+The system moves verses through progressive "Review Boxes" based on mastery. When you master a verse, it flows deeper into the system:
 
-Currently, two official plugins are available:
+Daily: Reviewed every session for initial memorization.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Odd/Even: Reviewed every other day to start building "muscle memory."
 
-## React Compiler
+Weekly: Assigned to a specific day of the week (e.g., all "Monday" verses).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Monthly: Assigned to a specific date (1–31). This ensures you review the verse 12 times a year forever.
 
-## Expanding the ESLint configuration
+The "Seed" Verses
+The app initializes with 10 foundational scriptures to build a strong spiritual habit:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Provision & Power: [2 Peter 1:2-3], [2 Corinthians 9:8]
+
+Faith & Belief: [Mark 9:23], [Mark 11:23-24]
+
+Peace & Strength: [Philippians 4:13], [Philippians 4:8], [Philippians 4:6-7]
+
+Lifestyle & Truth: [Ephesians 4:29], [3 John 1:2], [John 6:35]
+
+Tech Architecture
+Cloud Sync: Real-time syncing to Supabase via a user_vault table.
+
+Privacy: Anonymous 6-digit access codes—no email required.
