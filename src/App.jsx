@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { useScriptureSystem } from './hooks/useScriptureSystem';
 import { supabase } from './supabaseClient';
 import ReviewCard from './components/ReviewCard';
-import FAQDrawer from './FAQDrawer';
 import { AnimatePresence } from 'framer-motion';
-import { Plus, BookOpen, BarChart2, ChevronLeft, Search, Flame, Trophy, Cloud, CloudCheck, CloudOff } from 'lucide-react';
+import { Plus, BookOpen, BarChart2, ChevronLeft, Search, Flame, Trophy, Cloud, CloudCheck, CloudOff, X } from 'lucide-react';
 
 const SUGGESTIONS = [
   "2 Peter 1:2-3", "2 Corinthians 9:8", "Mark 9:23", "Mark 11:23-24", 
@@ -17,6 +16,64 @@ const BIBLE_VERSIONS = [
   { id: 'esv', name: 'ESV' }, { id: 'niv', name: 'NIV' }, { id: 'amp', name: 'AMP' },
   { id: 'kjv', name: 'KJV' }, { id: 'ylt', name: 'YLT' }
 ];
+
+// --- INTERNAL FAQ COMPONENT ---
+const FAQSection = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <button 
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 w-12 h-12 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center font-bold text-xl z-[9999] hover:scale-110 transition-transform"
+      >
+        ?
+      </button>
+
+      {isOpen && (
+        <div className="fixed inset-0 bg-black/60 z-[10000] flex justify-end" onClick={() => setIsOpen(false)}>
+          <div 
+            className="w-full max-w-sm bg-white h-full p-6 overflow-y-auto shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-black text-xl text-slate-800">GUIDE & FAQ</h2>
+              <button onClick={() => setIsOpen(false)} className="p-2 bg-slate-100 rounded-full"><X size={20}/></button>
+            </div>
+
+            <div className="space-y-6 text-sm text-slate-600">
+              <div className="bg-blue-50 p-4 rounded-2xl">
+                <p className="font-bold text-blue-600 mb-2 uppercase text-xs">Step 1: Watch the System</p>
+                <a href="https://youtu.be/f1wgNZ_Krtc" target="_blank" rel="noopener noreferrer" className="text-blue-700 underline font-semibold">
+                  Video: Memorize Scripture in 5 Minutes
+                </a>
+              </div>
+
+              <div>
+                <p className="font-bold text-slate-800 uppercase text-xs mb-2">How it Works</p>
+                <p>This app uses a "Waterfall" logic to move verses from your <strong>Daily</strong> box to <strong>Odd/Even</strong>, <strong>Weekly</strong>, and finally <strong>Monthly</strong> reviews based on mastery.</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-slate-800 uppercase text-xs mb-2">Syncing with Codes</p>
+                <p>Your 6-digit code is your unique key. Use it on the login screen to restore your data on any device. <strong>No email required!</strong></p>
+              </div>
+
+              <div>
+                <p className="font-bold text-slate-800 uppercase text-xs mb-2">The Seed Verses</p>
+                <ul className="list-disc pl-4 space-y-1 italic">
+                  <li>2 Peter 1:2-3, 2 Corinthians 9:8</li>
+                  <li>Mark 9:23, Mark 11:23-24</li>
+                  <li>Philippians 4:13, 4:8, 4:6-7</li>
+                  <li>Ephesians 4:29, 3 John 1:2, John 6:35</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
 
 export default function App() {
   const { system, setSystem, promoteVerse, isDuplicate, syncStatus } = useScriptureSystem();
@@ -180,11 +237,13 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* --- FAQ SECTION INJECTED HERE --- */}
+      <FAQSection />
     </div>
   );
 }
 
-// OnboardingFlow and AddScriptureView remain identical to previous master version
 function OnboardingFlow({ onComplete, fetchVerse, setSystem, setView }) {
   const [step, setStep] = useState(0); 
   const [data, setData] = useState({ username: "", preferredVersion: "nkjv", verses: [], authCode: "" });
@@ -310,7 +369,6 @@ function AddScriptureView({ system, onClose, onAdd, fetchVerse }) {
         if(isCustom) onAdd({ id: Date.now(), reference: ref, text: manual, version: 'CUSTOM' });
         else { const v = await fetchVerse(ref, version); if(v) onAdd(v); }
       }} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Save to Daily Box</button>
-      <FAQDrawer />
     </div>
   );
 }
