@@ -3,7 +3,7 @@ import { useScriptureSystem } from './hooks/useScriptureSystem';
 import { supabase } from './supabaseClient';
 import ReviewCard from './components/ReviewCard';
 import { AnimatePresence } from 'framer-motion';
-import { Plus, BookOpen, BarChart2, ChevronLeft, Search, Flame, Trophy, Cloud, CloudCheck, CloudOff, X } from 'lucide-react';
+import { Plus, BookOpen, BarChart2, ChevronLeft, Search, Flame, Trophy, Cloud, CloudCheck, CloudOff, X, ExternalLink } from 'lucide-react';
 
 const SUGGESTIONS = [
   "2 Peter 1:2-3", "2 Corinthians 9:8", "Mark 9:23", "Mark 11:23-24", 
@@ -17,14 +17,14 @@ const BIBLE_VERSIONS = [
   { id: 'kjv', name: 'KJV' }, { id: 'ylt', name: 'YLT' }
 ];
 
-// --- INTERNAL FAQ COMPONENT ---
+// --- COMPREHENSIVE FAQ COMPONENT ---
 const FAQSection = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-12 h-12 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center font-bold text-xl z-[9999] hover:scale-110 transition-transform"
+        className="fixed bottom-6 right-6 w-12 h-12 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center font-bold text-xl z-[9999] hover:scale-110 transition-transform border-2 border-white"
       >
         ?
       </button>
@@ -32,41 +32,77 @@ const FAQSection = () => {
       {isOpen && (
         <div className="fixed inset-0 bg-black/60 z-[10000] flex justify-end" onClick={() => setIsOpen(false)}>
           <div 
-            className="w-full max-w-sm bg-white h-full p-6 overflow-y-auto shadow-xl"
+            className="w-full max-w-md bg-white h-full p-8 overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="font-black text-xl text-slate-800">GUIDE & FAQ</h2>
-              <button onClick={() => setIsOpen(false)} className="p-2 bg-slate-100 rounded-full"><X size={20}/></button>
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="font-black text-2xl text-slate-800 tracking-tighter">FAQ & USER GUIDE</h2>
+              <button onClick={() => setIsOpen(false)} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200"><X size={24}/></button>
             </div>
 
-            <div className="space-y-6 text-sm text-slate-600">
-              <div className="bg-blue-50 p-4 rounded-2xl">
-                <p className="font-bold text-blue-600 mb-2 uppercase text-xs">Step 1: Watch the System</p>
-                <a href="https://youtu.be/f1wgNZ_Krtc" target="_blank" rel="noopener noreferrer" className="text-blue-700 underline font-semibold">
-                  Video: Memorize Scripture in 5 Minutes
+            <div className="space-y-8 text-slate-700 leading-relaxed">
+              
+              {/* 1. Video */}
+              <section>
+                <h3 className="font-black text-blue-600 mb-2 uppercase text-sm flex items-center gap-2">
+                  1. Watch the System in Action
+                </h3>
+                <p className="text-sm mb-4">Before reading the guide, you can watch this quick 5-minute overview of the "Waterfall" logic our app uses to help you retain scripture forever.</p>
+                <a href="https://youtu.be/f1wgNZ_Krtc" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-slate-900 text-white p-4 rounded-2xl font-bold text-sm hover:bg-slate-800 transition">
+                  Watch on YouTube <ExternalLink size={16}/>
                 </a>
-              </div>
+              </section>
 
-              <div>
-                <p className="font-bold text-slate-800 uppercase text-xs mb-2">How it Works</p>
-                <p>This app uses a "Waterfall" logic to move verses from your <strong>Daily</strong> box to <strong>Odd/Even</strong>, <strong>Weekly</strong>, and finally <strong>Monthly</strong> reviews based on mastery.</p>
-              </div>
+              {/* 2. Welcome */}
+              <section>
+                <h3 className="font-black text-slate-900 mb-2 uppercase text-sm">2. Welcome to Scripture Flow</h3>
+                <p className="text-sm">This app is designed to move Bible verses from your short-term memory into your long-term "Vault." Instead of just memorizing a verse and forgetting it next week, this system ensures you review it at scientifically timed intervals for the rest of your life.</p>
+              </section>
 
-              <div>
-                <p className="font-bold text-slate-800 uppercase text-xs mb-2">Syncing with Codes</p>
-                <p>Your 6-digit code is your unique key. Use it on the login screen to restore your data on any device. <strong>No email required!</strong></p>
-              </div>
-
-              <div>
-                <p className="font-bold text-slate-800 uppercase text-xs mb-2">The Seed Verses</p>
-                <ul className="list-disc pl-4 space-y-1 italic">
-                  <li>2 Peter 1:2-3, 2 Corinthians 9:8</li>
-                  <li>Mark 9:23, Mark 11:23-24</li>
-                  <li>Philippians 4:13, 4:8, 4:6-7</li>
-                  <li>Ephesians 4:29, 3 John 1:2, John 6:35</li>
+              {/* 3. Syncing */}
+              <section>
+                <h3 className="font-black text-slate-900 mb-2 uppercase text-sm">3. How to Sync Your Devices</h3>
+                <p className="text-sm mb-3 font-semibold text-blue-600">Your progress is saved securely in the cloud using a 6-Digit Access Code.</p>
+                <ul className="text-sm space-y-2">
+                  <li><strong>To Start:</strong> When you first open the app, it will generate a unique code for you. Write this down!</li>
+                  <li><strong>To Sync:</strong> If you open the app on a new phone or computer, simply enter your existing 6-digit code. All your verses, progress, and "Mastered" dates will instantly appear.</li>
+                  <li><strong>Privacy:</strong> We don't ask for your email or password. Your code is your key.</li>
                 </ul>
-              </div>
+              </section>
+
+              {/* 4. Waterfall */}
+              <section>
+                <h3 className="font-black text-slate-900 mb-2 uppercase text-sm">4. Understanding the "Waterfall" Boxes</h3>
+                <p className="text-xs font-bold text-slate-400 uppercase mb-3">The Four Stages of Promotion:</p>
+                <ul className="text-sm space-y-4">
+                  <li><span className="text-blue-600 font-bold">Daily Box (The Front Line):</span> This is where new verses live. You review these every single day until they are "locked in."</li>
+                  <li><span className="text-blue-600 font-bold">Odd/Even Box (The Muscle Memory):</span> Once a verse is comfortable, it moves here. You review these on either Odd or Even calendar days.</li>
+                  <li><span className="text-blue-600 font-bold">Weekly Box (The Rhythm):</span> These verses have graduated. You only review them once a week on a specific assigned day (e.g., every Monday).</li>
+                  <li><span className="text-blue-600 font-bold">Monthly Box (The Vault):</span> This is the final home for your verses. You review them once a month on a specific date (1–31). This ensures you visit every verse at least 12 times a year forever.</li>
+                </ul>
+              </section>
+
+              {/* 5. Seed Verses */}
+              <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                <h3 className="font-black text-slate-900 mb-3 uppercase text-sm">5. Your First 10 Verses (The Seeds)</h3>
+                <p className="text-xs mb-4 italic">Pre-loaded foundational scriptures to start your habit:</p>
+                <ul className="text-xs space-y-2 font-mono">
+                  <li><strong>Provision & Power:</strong> [2 Peter 1:2-3], [2 Corinthians 9:8]</li>
+                  <li><strong>Faith:</strong> [Mark 9:23], [Mark 11:23-24]</li>
+                  <li><strong>Peace & Strength:</strong> [Philippians 4:13], [Philippians 4:8], [Philippians 4:6-7]</li>
+                  <li><strong>Wisdom & Truth:</strong> [Ephesians 4:29], [3 John 1:2], [John 6:35]</li>
+                </ul>
+              </section>
+
+              {/* 6. Success Tips */}
+              <section className="pb-8">
+                <h3 className="font-black text-slate-900 mb-2 uppercase text-sm">6. Tips for Success</h3>
+                <ul className="text-sm space-y-3">
+                  <li>✅ <strong>Five Minutes a Day:</strong> The entire system is designed to take less than five minutes.</li>
+                  <li>✅ <strong>Read Aloud:</strong> Always say the verse and the reference out loud. It helps engage more of your brain.</li>
+                  <li>✅ <strong>Don't Rush:</strong> It isn't a race. Whether it takes a week or a month to move a verse from "Daily" to "Weekly," the goal is permanent retention.</li>
+                </ul>
+              </section>
             </div>
           </div>
         </div>
@@ -238,7 +274,6 @@ export default function App() {
         )}
       </main>
 
-      {/* --- FAQ SECTION INJECTED HERE --- */}
       <FAQSection />
     </div>
   );
