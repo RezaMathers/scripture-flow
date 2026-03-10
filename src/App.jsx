@@ -4,8 +4,8 @@ import { supabase } from './supabaseClient';
 import ReviewCard from './components/ReviewCard';
 import { AnimatePresence, motion } from 'framer-motion';
 import { 
-  Plus, BookOpen, BarChart2, ChevronLeft, Search, Flame, Trophy, 
-  Cloud, CloudCheck, CloudOff, X, ExternalLink, Settings, 
+  Plus, BookOpen, ChevronLeft, Search, Flame, Trophy, 
+  Cloud, CloudCheck, X, ExternalLink, Settings, 
   RotateCcw, Moon, Sun, ArrowUp, ArrowDown, Undo2
 } from 'lucide-react';
 
@@ -28,6 +28,7 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'system');
 
+  // Dark Mode Logic
   useEffect(() => {
     const root = window.document.documentElement;
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -41,7 +42,7 @@ export default function App() {
                      Object.values(system.dates).flat().length + system.archive.length;
 
   const fetchVerse = async (ref, ver) => {
-    if (isDuplicate(ref)) { alert("Already in your library!"); return null; }
+    if (isDuplicate(ref)) { alert("Already in your system!"); return null; }
     try {
       const response = await fetch(`/${ver}.json`);
       const bible = await response.json();
@@ -77,7 +78,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 flex flex-col items-center font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 flex flex-col items-center font-body transition-colors duration-300">
       <main className="w-full max-w-md pb-20">
         
         {view === 'onboard' && (
@@ -91,39 +92,37 @@ export default function App() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-2xl font-black text-blue-600 dark:text-blue-400 tracking-tight font-rounded">
-                  {system.username.toUpperCase()}'S FLOW
+                <h1 className="text-2xl font-heading font-black text-blue-600 dark:text-blue-400 tracking-tight">
+                  {system.username ? system.username.toUpperCase() : "MY"}'S FLOW
                 </h1>
                 <div className="flex items-center gap-2 mt-1">
                   {syncStatus === 'saved' ? (
-                    <div className="text-[10px] font-bold text-green-500 flex items-center gap-1"><CloudCheck size={12}/> CLOUD SYNCED</div>
+                    <div className="text-[10px] font-black text-green-500 flex items-center gap-1 uppercase tracking-widest"><CloudCheck size={12}/> Cloud Synced</div>
                   ) : (
-                    <div className="text-[10px] font-bold text-slate-400 flex items-center gap-1 animate-pulse"><Cloud size={12}/> SYNCING...</div>
+                    <div className="text-[10px] font-black text-slate-400 flex items-center gap-1 animate-pulse uppercase tracking-widest"><Cloud size={12}/> Syncing...</div>
                   )}
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="p-3 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border dark:border-slate-800">
-                  {theme === 'light' ? <Moon size={20} className="text-slate-600"/> : <Sun size={20} className="text-yellow-400"/>}
-                </button>
-              </div>
+              <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="p-3 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border dark:border-slate-800">
+                {theme === 'light' ? <Moon size={20} className="text-slate-600"/> : <Sun size={20} className="text-yellow-400"/>}
+              </button>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-white dark:bg-slate-900 p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 text-center">
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Library</p>
-                <p className="text-xl font-black dark:text-white">{totalVerses}</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Library</p>
+                <p className="text-xl font-heading font-black dark:text-white">{totalVerses}</p>
               </div>
               <div className="bg-white dark:bg-slate-900 p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 text-center">
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Streak</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Streak</p>
                 <div className="flex items-center justify-center gap-1 text-orange-500">
                   <Flame size={14} fill="currentColor"/>
-                  <p className="text-xl font-black">{system.streak}d</p>
+                  <p className="text-xl font-heading font-black">{system.streak || 0}d</p>
                 </div>
               </div>
               <div className="bg-white dark:bg-slate-900 p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 text-center">
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Mastered</p>
-                <p className="text-xl font-black text-blue-500">{system.archive.length}</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mastered</p>
+                <p className="text-xl font-heading font-black text-blue-500">{system.archive.length}</p>
               </div>
             </div>
             
@@ -131,17 +130,17 @@ export default function App() {
               <div className="bg-white/20 p-5 rounded-full group-hover:scale-110 transition">
                 <BookOpen size={44} />
               </div>
-              <p className="text-2xl font-black tracking-tight">Walk the Word</p>
+              <p className="text-2xl font-heading font-black tracking-tight uppercase">Walk the Word</p>
             </button>
 
             <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => setView('library')} className="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border dark:border-slate-800 flex flex-col items-center gap-2 hover:bg-slate-50 transition">
+              <button onClick={() => setView('library')} className="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border dark:border-slate-800 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <Settings className="text-slate-400" />
-                <p className="text-xs font-bold uppercase dark:text-slate-300 tracking-widest">Manage</p>
+                <p className="text-xs font-black uppercase dark:text-slate-300 tracking-widest">Manage</p>
               </button>
-              <button onClick={() => setView('add')} className="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border dark:border-slate-800 flex flex-col items-center gap-2 hover:bg-slate-50 transition">
+              <button onClick={() => setView('add')} className="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border dark:border-slate-800 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <Plus className="text-blue-500" />
-                <p className="text-xs font-bold uppercase dark:text-slate-300 tracking-widest">Add Verse</p>
+                <p className="text-xs font-black uppercase dark:text-slate-300 tracking-widest">Add Verse</p>
               </button>
             </div>
           </div>
@@ -149,7 +148,7 @@ export default function App() {
 
         {view === 'review' && (
           <div className="relative flex flex-col items-center">
-            <button onClick={() => setView('home')} className="mb-8 self-start p-2 text-slate-400 font-bold flex items-center gap-1"><ChevronLeft/> Cancel Review</button>
+            <button onClick={() => setView('home')} className="mb-8 self-start p-2 text-slate-400 font-bold flex items-center gap-1 uppercase text-xs tracking-widest"><ChevronLeft size={16}/> Cancel Review</button>
             <AnimatePresence mode="wait">
               {reviewQueue[currentIndex] && (
                 <ReviewCard 
@@ -161,7 +160,7 @@ export default function App() {
                       setCurrentIndex(currentIndex + 1);
                     } else {
                       const today = new Date().toDateString();
-                      let newStreak = system.streak;
+                      let newStreak = system.streak || 0;
                       if (system.lastReviewDate !== today) {
                         newStreak = (system.lastReviewDate === new Date(Date.now() - 86400000).toDateString()) ? newStreak + 1 : 1;
                       }
@@ -190,16 +189,12 @@ export default function App() {
 
         {view === 'complete' && (
            <div className="text-center py-20 space-y-8 bg-white dark:bg-slate-900 rounded-[3rem] shadow-xl p-10 border dark:border-slate-800">
-              <div className="relative inline-block">
-                <Trophy size={100} className="mx-auto text-yellow-500" />
-                <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity }} className="absolute -top-2 -right-2 text-4xl">✨</motion.div>
-              </div>
-              <h2 className="text-3xl font-black dark:text-white uppercase tracking-tighter">Daily Walk Complete</h2>
+              <Trophy size={100} className="mx-auto text-yellow-500" />
+              <h2 className="text-3xl font-heading font-black dark:text-white uppercase tracking-tighter">Daily Walk Complete</h2>
               <p className="text-slate-500 dark:text-slate-400 font-medium italic">"Your word is a lamp to my feet and a light to my path."</p>
               <button onClick={() => setView('home')} className="w-full bg-blue-600 text-white py-5 rounded-3xl font-black shadow-lg">Return to Dashboard</button>
            </div>
         )}
-
       </main>
 
       <FAQDrawer resetSystem={resetSystem} />
@@ -214,20 +209,20 @@ function LibraryView({ system, onClose, moveVerse, unmasterVerse }) {
     { title: 'Daily Box', data: system.daily, key: 'daily' },
     { title: 'Odd Box', data: system.odd, key: 'odd' },
     { title: 'Even Box', data: system.even, key: 'even' },
-    { title: 'Mastered', data: system.archive, key: 'archive' }
+    { title: 'Mastered (Vault)', data: system.archive, key: 'archive' }
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-3xl border dark:border-slate-800">
-        <h2 className="text-xl font-black dark:text-white uppercase tracking-tighter ml-2">Library Manager</h2>
+        <h2 className="text-xl font-heading font-black dark:text-white uppercase tracking-tighter ml-2">Library Manager</h2>
         <button onClick={onClose} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full"><X/></button>
       </div>
       {sections.map(sec => (
         <div key={sec.key} className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 shadow-sm border dark:border-slate-800">
           <h3 className="text-[10px] font-black text-blue-500 uppercase mb-4 px-2 tracking-[0.2em]">{sec.title}</h3>
           <div className="space-y-3">
-            {sec.data.length === 0 && <p className="text-xs text-slate-300 italic px-2">No verses assigned to this box.</p>}
+            {sec.data.length === 0 && <p className="text-xs text-slate-300 italic px-2">No verses here.</p>}
             {sec.data.map((v, i) => (
               <div key={v.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border dark:border-slate-700/50">
                 <div className="flex-1">
@@ -236,13 +231,11 @@ function LibraryView({ system, onClose, moveVerse, unmasterVerse }) {
                 </div>
                 <div className="flex gap-2">
                   {sec.key === 'archive' ? (
-                    <button onClick={() => unmasterVerse(v.id)} className="p-3 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-xl" title="Return to Daily">
-                      <Undo2 size={18}/>
-                    </button>
+                    <button onClick={() => unmasterVerse(v.id)} className="p-3 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-xl"><Undo2 size={18}/></button>
                   ) : (
                     <div className="flex gap-1">
-                      <button onClick={() => moveVerse(sec.key, i, -1)} className="p-2 text-slate-400 hover:text-slate-600 transition disabled:opacity-20" disabled={i === 0}><ArrowUp size={16}/></button>
-                      <button onClick={() => moveVerse(sec.key, i, 1)} className="p-2 text-slate-400 hover:text-slate-600 transition disabled:opacity-20" disabled={i === sec.data.length - 1}><ArrowDown size={16}/></button>
+                      <button onClick={() => moveVerse(sec.key, i, -1)} className="p-2 text-slate-400 disabled:opacity-20" disabled={i === 0}><ArrowUp size={16}/></button>
+                      <button onClick={() => moveVerse(sec.key, i, 1)} className="p-2 text-slate-400 disabled:opacity-20" disabled={i === sec.data.length - 1}><ArrowDown size={16}/></button>
                     </div>
                   )}
                 </div>
@@ -259,38 +252,51 @@ function FAQDrawer({ resetSystem }) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl font-black text-2xl z-[50] hover:scale-110 transition border-4 border-white dark:border-slate-900">?</button>
+      <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl font-black text-2xl z-[50] border-4 border-white dark:border-slate-900">?</button>
       {isOpen && (
         <div className="fixed inset-0 bg-black/60 z-[100] flex justify-end" onClick={() => setIsOpen(false)}>
-          <motion.div 
-            initial={{ x: '100%' }} animate={{ x: 0 }}
-            className="w-full max-w-sm bg-white dark:bg-slate-950 h-full p-8 overflow-y-auto shadow-2xl" 
-            onClick={e => e.stopPropagation()}
-          >
+          <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} className="w-full max-w-md bg-white dark:bg-slate-950 h-full p-8 overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-10">
-              <h2 className="font-black text-2xl dark:text-white tracking-tighter">GUIDE & SETTINGS</h2>
+              <h2 className="font-heading font-black text-2xl dark:text-white uppercase tracking-tighter">Guide & FAQ</h2>
               <button onClick={() => setIsOpen(false)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full"><X/></button>
             </div>
-            
             <div className="space-y-8 text-sm">
-               <a href="https://youtu.be/f1wgNZ_Krtc" target="_blank" className="flex items-center justify-center gap-3 p-5 bg-slate-900 text-white rounded-3xl font-black tracking-tight hover:bg-slate-800 transition">
-                 <ExternalLink size={18}/> WATCH VIDEO GUIDE
-               </a>
-               
-               <div className="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-[2rem] border border-blue-100 dark:border-blue-800/50">
-                  <p className="font-black text-blue-600 uppercase text-[10px] tracking-widest mb-3">The Waterfall System</p>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">Verses automatically graduate from <b>Daily</b> to <b>Weekly</b> and finally to the <b>Monthly Vault</b> as you master them. This ensures you never forget a verse you've learned.</p>
-               </div>
-
-               <div className="pt-10 border-t dark:border-slate-800">
-                  <p className="font-black text-slate-400 uppercase text-[10px] tracking-widest mb-4">Danger Zone</p>
-                  <button 
-                    onClick={() => { if(confirm("This will wipe all verses and reset your streak. Are you sure?")) { resetSystem(); window.location.reload(); } }}
-                    className="w-full flex items-center justify-center gap-2 p-5 text-red-500 font-black bg-red-50 dark:bg-red-900/10 rounded-2xl hover:bg-red-100 transition"
-                  >
-                    <RotateCcw size={18}/> RESET INITIAL SCRIPTURES
-                  </button>
-               </div>
+              <section>
+                <h3 className="font-heading font-black text-blue-600 mb-2 uppercase text-xs tracking-widest">1. Tutorial Video</h3>
+                <a href="https://youtu.be/f1wgNZ_Krtc" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-slate-900 text-white p-4 rounded-2xl font-black text-xs">WATCH ON YOUTUBE <ExternalLink size={14}/></a>
+              </section>
+              <section className="space-y-4">
+                <div>
+                  <h4 className="font-heading font-black dark:text-white uppercase text-xs">2. What is Scripture Flow?</h4>
+                  <p className="text-slate-500 dark:text-slate-400">A spaced-repetition tool designed to move verses from short-term memory to the "Vault."</p>
+                </div>
+                <div>
+                  <h4 className="font-heading font-black dark:text-white uppercase text-xs">3. The Restore Code</h4>
+                  <p className="text-slate-500 dark:text-slate-400">Your 6-digit key allows you to sync your library across devices without an email login.</p>
+                </div>
+                <div>
+                  <h4 className="font-heading font-black dark:text-white uppercase text-xs">4. The Boxes (The Waterfall)</h4>
+                  <ul className="list-disc pl-5 text-slate-500 dark:text-slate-400 space-y-1">
+                    <li><strong>Daily:</strong> Reviewed every day.</li>
+                    <li><strong>Odd/Even:</strong> Reviewed every other day.</li>
+                    <li><strong>Weekly:</strong> Reviewed once a week.</li>
+                    <li><strong>Monthly:</strong> Reviewed once a month.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-heading font-black dark:text-white uppercase text-xs">5. Mastered Verses</h4>
+                  <p className="text-slate-500 dark:text-slate-400">Clicking "Mastered" graduates a verse to the next box. If it's already in the Monthly box, it goes to the Vault.</p>
+                </div>
+                <div>
+                  <h4 className="font-heading font-black dark:text-white uppercase text-xs">6. Best Practices</h4>
+                  <p className="text-slate-500 dark:text-slate-400">Read verses aloud. If you miss a word, don't click Mastered—keep it in the box for another day.</p>
+                </div>
+              </section>
+              <div className="pt-8 border-t dark:border-slate-800">
+                <button onClick={() => { if(confirm("This wipes all data. Continue?")) { resetSystem(); window.location.reload(); } }} className="w-full flex items-center justify-center gap-2 p-4 text-red-500 font-black bg-red-50 dark:bg-red-900/10 rounded-2xl">
+                  <RotateCcw size={18}/> RESET INITIAL SCRIPTURES
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -314,13 +320,13 @@ function OnboardingFlow({ onComplete, fetchVerse }) {
       if (v) setData({...data, verses: [...data.verses, v]});
     }
   };
-  
+
   return (
     <div className="bg-white dark:bg-slate-900 p-8 rounded-[3.5rem] shadow-2xl min-h-[550px] flex flex-col justify-center text-center border dark:border-slate-800">
        {step === 0 && (
           <div className="space-y-6">
-            <h1 className="text-4xl font-black text-blue-600 tracking-tighter italic">Scripture Flow</h1>
-            <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Your word, forever stored.</p>
+            <h1 className="text-4xl font-heading font-black text-blue-600 tracking-tighter italic">Scripture Flow</h1>
+            <p className="text-slate-400 font-black uppercase text-[10px] tracking-widest">Memorize for Life.</p>
             <button onClick={() => setStep(1)} className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-lg shadow-xl mt-6 active:scale-95 transition">GET STARTED</button>
             <button onClick={() => setStep('restore')} className="w-full py-4 text-slate-400 font-black uppercase text-xs tracking-widest">I HAVE A CODE</button>
           </div>
@@ -328,20 +334,20 @@ function OnboardingFlow({ onComplete, fetchVerse }) {
 
        {step === 'restore' && (
         <div className="space-y-6">
-          <h2 className="text-xl font-black uppercase tracking-tight">Restore Flow</h2>
+          <h2 className="text-xl font-heading font-black uppercase tracking-tight">Restore Flow</h2>
           <input className="w-full p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl text-center text-2xl font-mono font-black tracking-[0.3em] outline-none" placeholder="A1B2C3" maxLength={6} onChange={e => setData({...data, authCode: e.target.value.toUpperCase()})} />
           <button onClick={async () => {
             const { data: cloudData, error } = await supabase.from('user_vault').select('data').eq('auth_code', data.authCode).single();
             if (error || !cloudData) alert("Code not found!");
             else { onComplete(cloudData.data); }
           }} className="w-full bg-blue-600 text-white py-5 rounded-3xl font-black">SYNC DATA</button>
-          <button onClick={() => setStep(0)} className="text-slate-400 font-bold uppercase text-[10px]">Go Back</button>
+          <button onClick={() => setStep(0)} className="text-slate-400 font-black uppercase text-[10px]">Go Back</button>
         </div>
        )}
 
        {step === 1 && (
          <div className="space-y-6">
-            <h2 className="text-2xl font-black uppercase tracking-tight">What's your name?</h2>
+            <h2 className="text-2xl font-heading font-black uppercase tracking-tight">What's your name?</h2>
             <input className="w-full p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl text-center font-black text-xl outline-none dark:text-white" placeholder="Adam" onChange={e => setData({...data, username: e.target.value})} />
             <button onClick={() => setStep(2)} className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black disabled:opacity-50" disabled={!data.username}>CONTINUE</button>
          </div>
@@ -349,7 +355,7 @@ function OnboardingFlow({ onComplete, fetchVerse }) {
 
        {step === 2 && (
          <div className="space-y-4">
-            <h2 className="text-xl font-black uppercase tracking-tight mb-4">Preferred Version</h2>
+            <h2 className="text-xl font-heading font-black uppercase tracking-tight mb-4">Preferred Version</h2>
             <div className="grid grid-cols-2 gap-3">
               {BIBLE_VERSIONS.map(v => (
                 <button key={v.id} onClick={() => setData({...data, preferredVersion: v.id})} className={`p-5 rounded-2xl font-black border-2 transition ${data.preferredVersion === v.id ? 'border-blue-600 bg-blue-50 text-blue-600 dark:bg-blue-900/20' : 'border-slate-100 dark:border-slate-800 text-slate-400'}`}>
@@ -363,8 +369,8 @@ function OnboardingFlow({ onComplete, fetchVerse }) {
 
        {step === 3 && (
          <div className="text-left">
-            <h2 className="text-xl font-black uppercase tracking-tighter mb-1">Pick 10 Seeds</h2>
-            <p className="text-[10px] text-slate-400 font-bold uppercase mb-4 tracking-widest">Progress: {data.verses.length}/10</p>
+            <h2 className="text-xl font-heading font-black uppercase tracking-tighter mb-1">Pick 10 Seeds</h2>
+            <p className="text-[10px] text-slate-400 font-black uppercase mb-4 tracking-widest">Selected: {data.verses.length}/10</p>
             <div className="flex gap-2 mb-4">
               <input className="flex-1 p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl text-sm font-bold outline-none dark:text-white" placeholder="Search (e.g. John 3:16)" value={search} onChange={e => setSearch(e.target.value)} />
               <button onClick={() => toggleVerse(search)} className="bg-slate-900 text-white p-4 rounded-2xl"><Search size={20}/></button>
@@ -373,36 +379,31 @@ function OnboardingFlow({ onComplete, fetchVerse }) {
               {SUGGESTIONS.map(ref => {
                 const selected = data.verses.some(v => v.reference === ref);
                 return (
-                  <button key={ref} onClick={() => toggleVerse(ref)} className={`p-4 rounded-2xl text-[10px] font-black transition ${selected ? 'bg-green-500 text-white shadow-inner scale-95' : 'bg-blue-50 dark:bg-blue-900/20 text-blue-500'}`}>
-                    {ref}
-                  </button>
+                  <button key={ref} onClick={() => toggleVerse(ref)} className={`p-4 rounded-2xl text-[10px] font-black transition ${selected ? 'bg-green-500 text-white shadow-inner scale-95' : 'bg-blue-50 dark:bg-blue-900/20 text-blue-500'}`}>{ref}</button>
                 );
               })}
             </div>
-            <button onClick={() => { if(data.verses.length < 5) return alert("Select at least 5 to start!"); setData({...data, authCode: genCode()}); setStep(4); }} className="w-full bg-slate-900 text-white py-5 rounded-3xl font-black">GENERATE ACCESS CODE</button>
+            <button onClick={() => { if(data.verses.length < 5) return alert("Pick at least 5!"); setData({...data, authCode: genCode()}); setStep(4); }} className="w-full bg-slate-900 text-white py-5 rounded-3xl font-black">GENERATE ACCESS CODE</button>
          </div>
        )}
 
        {step === 4 && (
           <div className="space-y-6">
-            <h2 className="font-black text-2xl uppercase tracking-tighter">Your Secret Key</h2>
+            <h2 className="font-heading font-black text-2xl uppercase tracking-tighter">Your Secret Key</h2>
             <div className="bg-blue-50 dark:bg-blue-900/20 p-10 rounded-[2.5rem] border-2 border-dashed border-blue-200">
               <p className="text-4xl font-mono font-black text-blue-600 tracking-[0.2em]">{data.authCode}</p>
             </div>
-            <p className="text-[10px] text-slate-400 font-bold uppercase px-8">Save this code. You'll need it to log in on other devices.</p>
+            <p className="text-[10px] text-slate-400 font-black uppercase px-8">Write this down. It is your only way to restore your library.</p>
             <button onClick={() => {
-              const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
               onComplete({
                 username: data.username,
                 preferredVersion: data.preferredVersion,
                 authCode: data.authCode,
-                daily: data.verses.slice(0, 3),
-                odd: [data.verses[3]],
-                even: [data.verses[4]],
-                days: dayOrder.reduce((acc, d, i) => ({ ...acc, [d]: data.verses[i+5] ? [data.verses[i+5]] : [] }), {}),
-                archive: []
+                daily: data.verses,
+                odd: [], even: [], days: { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] },
+                archive: [], streak: 0, lastReviewDate: null
               });
-            }} className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black shadow-lg">I've Saved It</button>
+            }} className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black shadow-lg">Enter the Flow</button>
           </div>
        )}
     </div>
@@ -415,15 +416,10 @@ function AddScriptureView({ system, onClose, onAdd, fetchVerse }) {
   return (
     <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-xl border dark:border-slate-800">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="font-black dark:text-white uppercase tracking-tighter text-xl">Add to Daily</h2>
+        <h2 className="font-heading font-black dark:text-white uppercase tracking-tighter text-xl">Add to Daily</h2>
         <button onClick={onClose} className="p-2 bg-slate-50 dark:bg-slate-800 rounded-full"><X/></button>
       </div>
-      <input 
-        className="w-full p-6 bg-slate-100 dark:bg-slate-800 rounded-3xl mb-6 font-black text-lg outline-none dark:text-white placeholder:text-slate-300" 
-        placeholder="e.g. Philippians 4:8" 
-        value={ref} 
-        onChange={e => setRef(e.target.value)} 
-      />
+      <input className="w-full p-6 bg-slate-100 dark:bg-slate-800 rounded-3xl mb-6 font-black text-lg outline-none dark:text-white placeholder:text-slate-300" placeholder="e.g. Philippians 4:8" value={ref} onChange={e => setRef(e.target.value)} />
       <button 
         disabled={loading}
         onClick={async () => { 
