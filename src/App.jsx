@@ -5,7 +5,7 @@ import ReviewCard from './components/ReviewCard';
 import { AnimatePresence, motion } from 'framer-motion';
 import { 
   Plus, BookOpen, ChevronLeft, Search, Flame, Trophy, 
-  Cloud, CloudCheck, X, Settings, RotateCcw, LogOut, Play
+  Cloud, CloudCheck, X, Settings, RotateCcw, LogOut, Play, Coffee
 } from 'lucide-react';
 
 const SUGGESTIONS = [
@@ -27,7 +27,7 @@ export default function App() {
   const [reviewQueue, setReviewQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // 1. Theme Logic: Follow OS preferences
+  // 1. Theme Logic
   useEffect(() => {
     const root = window.document.documentElement;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -37,31 +37,37 @@ export default function App() {
     return () => mediaQuery.removeEventListener('change', applyTheme);
   }, []);
 
-  // 2. Calendar-Based Streak Logic
+  // 2. UTC-Based Streak Logic (Triggered on App Open)
   useEffect(() => {
-    if (system.lastReviewDate) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    if (system.onboarded) {
+      const now = new Date();
+      const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString().split('T')[0];
       
-      const lastDate = new Date(system.lastReviewDate);
-      lastDate.setHours(0, 0, 0, 0);
-      
-      const diffTime = today - lastDate;
-      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      if (system.lastOpenDate !== todayUTC) {
+        const lastDate = system.lastOpenDate ? new Date(system.lastOpenDate) : null;
+        const yesterday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1)).toISOString().split('T')[0];
 
-      // If more than 1 day has passed since the last completion, streak breaks
-      if (diffDays > 1) {
-        setSystem({ ...system, streak: 0 });
+        let newStreak = system.streak || 0;
+
+        if (system.lastOpenDate === yesterday) {
+          // Keep current streak if they haven't finished today, or it will increment on complete.
+          // But as per requirements: "any calendar date on which the user opens counts"
+          newStreak += 1;
+        } else if (!system.lastOpenDate || system.lastOpenDate < yesterday) {
+          // Missed a day or first time
+          newStreak = 1;
+        }
+
+        setSystem({ ...system, lastOpenDate: todayUTC, streak: newStreak });
       }
     }
-  }, []);
+  }, [system.onboarded]);
 
   // 3. Navigation Actions
   const handleLogout = () => {
     if (confirm("Log out? Your verses and streak are safe. Use your code to return.")) {
-      setSystem({ ...system, onboarded: false });
-      setOnboardStep(0); 
       setView('onboard');
+      setOnboardStep(0); 
       return true;
     }
     return false;
@@ -74,16 +80,15 @@ export default function App() {
         daily: [], odd: [], even: [],
         days: { monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: [], sunday: [] },
         dates: {}, archive: [],
-        streak: 0, lastReviewDate: null
+        streak: 0, lastOpenDate: null, lastReviewDate: null
       });
-      setOnboardStep(3); // Go straight to Seed Selection
+      setOnboardStep(3);
       setView('onboard');
       return true;
     }
     return false;
   };
 
-  // 4. Waterfall Promotion Logic
   const promoteVerse = (verseId, sourceBox) => {
     const updatedSystem = { ...system };
     let verseToMove = null;
@@ -102,8 +107,8 @@ export default function App() {
     if (!verseToMove) return;
 
     if (sourceBox === 'daily') {
-      if (updatedSystem.odd.length === 0) { updatedSystem.odd.push(verseToMove); updatedSystem.daily = []; }
-      else if (updatedSystem.even.length === 0) { updatedSystem.even.push(verseToMove); updatedSystem.daily = []; }
+      if (updatedSystem.odd.length === 0) { updatedSystem.odd.push(verseToMove); updatedSystem.daily = updatedSystem.daily.filter(v => v.id !== verseId); }
+      else if (updatedSystem.even.length === 0) { updatedSystem.even.push(verseToMove); updatedSystem.daily = updatedSystem.daily.filter(v => v.id !== verseId); }
     } 
     else if (sourceBox === 'odd' || sourceBox === 'even') {
       const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -162,12 +167,12 @@ export default function App() {
           <div className="space-y-6">
             <header className="flex justify-between items-end">
               <div>
-                <h1 className="text-6xl font-cookie text-blue-600 dark:text-blue-400 leading-none">Waterfall</h1>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">{system.username}'s Flow</p>
+                <h1 className="text-4xl font-cookie text-blue-600 dark:text-blue-400 leading-none">Scripture Memory</h1>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">memory verses made easier</p>
               </div>
               <div className="flex items-center gap-2 text-orange-500 bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl shadow-sm border dark:border-slate-800">
                 <Flame size={16} fill="currentColor"/>
-                <span className="font-bold">{system.streak || 0}d</span>
+                <span className="font-bold">{system.streak || 0}</span>
               </div>
             </header>
 
@@ -213,16 +218,7 @@ export default function App() {
                     onNext={(mastered) => {
                       if (mastered) promoteVerse(reviewQueue[currentIndex].id, reviewQueue[currentIndex].source);
                       if (currentIndex + 1 < reviewQueue.length) setCurrentIndex(currentIndex + 1);
-                      else {
-                        const todayStr = new Date().toDateString();
-                        const isNewDay = system.lastReviewDate !== todayStr;
-                        setSystem({ 
-                          ...system, 
-                          lastReviewDate: todayStr, 
-                          streak: isNewDay ? (system.streak || 0) + 1 : system.streak 
-                        });
-                        setView('complete');
-                      }
+                      else setView('complete');
                     }}
                   />
                 </div>
@@ -259,8 +255,8 @@ function OnboardingFlow({ system, initialStep, onComplete, fetchVerse }) {
     <div className="bg-white dark:bg-slate-900 p-8 rounded-[3.5rem] shadow-2xl min-h-[550px] flex flex-col justify-center text-center border dark:border-slate-800">
       {step === 0 && (
         <div className="space-y-6">
-          <h1 className="text-6xl font-cookie text-blue-600">Waterfall</h1>
-          <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Hidden Treasures</p>
+          <h1 className="text-5xl font-cookie text-blue-600">Scripture Memory</h1>
+          <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">memory verses made easier</p>
           <button onClick={() => setStep(1)} className="w-full bg-blue-600 text-white py-6 rounded-3xl font-bold text-lg shadow-xl mt-6">I'm New</button>
           <button onClick={() => setStep('restore')} className="w-full py-4 text-slate-400 font-bold uppercase text-xs tracking-widest">I Have a Code</button>
         </div>
@@ -332,8 +328,6 @@ function OnboardingFlow({ system, initialStep, onComplete, fetchVerse }) {
   );
 }
 
-// --- SUB COMPONENTS ---
-
 function LibraryView({ system, onClose }) {
   const sections = [
     { title: 'Daily Box', data: system.daily, key: 'daily' },
@@ -358,7 +352,7 @@ function LibraryView({ system, onClose }) {
               <div key={v.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                 <div>
                   <p className="text-sm font-bold dark:text-white">{v.reference}</p>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase">{v.version} {v.monthlyViews !== undefined ? `• ${v.monthlyViews}/3 Views` : ''}</p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase">{v.version} {v.monthlyViews !== undefined ? `• ${v.monthlyViews}/3 Mastered` : ''}</p>
                 </div>
               </div>
             ))}
@@ -393,7 +387,7 @@ function FAQDrawer({ onReset, onLogout }) {
       <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl font-bold text-2xl z-[50] border-4 border-white dark:border-slate-900 hover:scale-110 transition">?</button>
       {isOpen && (
         <div className="fixed inset-0 bg-black/60 z-[100] flex justify-end" onClick={() => setIsOpen(false)}>
-          <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} className="w-full max-w-sm bg-white dark:bg-slate-950 h-full p-8 overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} className="w-full max-sm:max-w-full max-w-sm bg-white dark:bg-slate-950 h-full p-8 overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-10">
               <h2 className="font-bold text-2xl dark:text-white tracking-tight">System Guide</h2>
               <button onClick={() => setIsOpen(false)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full"><X/></button>
@@ -401,9 +395,15 @@ function FAQDrawer({ onReset, onLogout }) {
             
             <div className="space-y-10 text-sm text-slate-600 dark:text-slate-400">
                {/* Video Section */}
-               <div className="aspect-video bg-slate-200 dark:bg-slate-800 rounded-3xl flex flex-col items-center justify-center gap-2 border-2 border-dashed border-slate-300 dark:border-slate-700">
-                 <Play size={40} className="text-slate-400" />
-                 <p className="font-bold uppercase text-[10px] tracking-widest text-slate-400">Video Guide Placeholder</p>
+               <div className="aspect-video bg-slate-200 dark:bg-slate-800 rounded-3xl overflow-hidden shadow-inner border dark:border-slate-800">
+                  <iframe 
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/f1wgNZ_Krtc" 
+                    title="Scripture Memory System" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen>
+                  </iframe>
                </div>
 
                {/* Step by Step Overview */}
@@ -432,6 +432,9 @@ function FAQDrawer({ onReset, onLogout }) {
                </div>
 
                <div className="pt-10 border-t dark:border-slate-800 space-y-4">
+                  <a href="https://ko-fi.com/matheka" target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 p-5 text-white font-bold bg-[#29abe0] rounded-2xl shadow-lg hover:scale-[1.02] transition active:scale-95">
+                    <Coffee size={20}/> Buy me a coffee
+                  </a>
                   <button onClick={() => { if(onLogout()) setIsOpen(false); }} className="w-full flex items-center justify-center gap-2 p-5 text-slate-600 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 rounded-2xl shadow-sm">
                     <LogOut size={18}/> Log out and return to intro
                   </button>
